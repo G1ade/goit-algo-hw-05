@@ -1,13 +1,30 @@
-from pathlib import Path
 from function import *
 import sys
 
-com_line_arg = [arg for arg in sys.argv]
-file_path = Path(com_line_arg[1])
+def main(args: list):
 
-if len(com_line_arg) > 2:
-    option_arg = com_line_arg[2]
-else:
-    option_arg = 0
+    try:
+        logs = load_logs(args[1])
 
-print(load_logs(file_path))
+        if logs is not None:
+            print(display_log_counts(count_logs_by_level(logs)))
+
+            if len(args) > 2:
+                level = args[2]
+                filter_logs = filter_logs_by_level(logs, level)
+                print(f'\nДеталі логів для рівня "{level.upper()}":')
+
+                for line in filter_logs:
+                    print(line)
+
+    
+    except FileNotFoundError:
+        print(f"Error: file '{args[1]}' not found")
+    except ValueError:
+        print('Error: file does not contain information or is in the wrong format')
+    except IndexError:
+        print('Error: Specify the file path')
+
+
+if __name__ == "__main__":
+    main(sys.argv)
