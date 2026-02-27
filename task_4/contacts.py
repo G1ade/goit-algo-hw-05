@@ -1,3 +1,79 @@
+def add_input_error(func):
+    """
+    Decorator that catches ValueError for add_contact function.
+    
+    Returns user-friendly message when name and phone are not provided.
+    
+    Args:
+        func: Function to decorate (add_contact)
+        
+    Returns:
+        inner: Wrapped function with error handling
+    """
+    def inner(*args, **kwargs):
+        try:
+            return func(*args, **kwargs)
+        except ValueError:
+            return "Give me name and phone please."
+
+    return inner
+
+def change_input_error(funk):
+    """
+    Decorator that catches ValueError for change_contact function.
+    
+    Returns user-friendly message when contact name and new number are not provided.
+    
+    Args:
+        func: Function to decorate (change_contact)
+        
+    Returns:
+        inner: Wrapped function with error handling
+    """
+    def inner(*args, **kwargs):
+        try:
+            return funk(*args, **kwargs)
+        except ValueError:
+            return "You need to enter the contact's name and new number"
+        
+    return inner
+
+def phone_input_error(funk):
+    """
+    Decorator that handles errors for phone lookup function.
+    
+    Catches IndexError (missing contact name) and KeyError (contact not found).
+    When contact is not found, offers to add the contact interactively.
+    
+    Args:
+        func: Function to decorate (phone_username)
+        
+    Returns:
+        inner: Wrapped function with error handling and interactive add feature
+    """
+    def inner(*args, **kwargs):
+        try:
+            return funk(*args, **kwargs)
+        except IndexError:
+            return "You need to enter the contact's name"
+        except KeyError:
+            # Extract contact name from args (first element of first argument)
+            contact_name = args[0][0]
+            print(f"The contact '{contact_name}' does not exist in your list")
+
+            while True:
+                user_input = input('Would you like to add a number? Yes/No ')
+                # Get first character and normalize to uppercase
+                first_char = user_input[0].upper()
+
+                if first_char == 'Y':
+                    number = input(f'enter {contact_name} contact number ')
+                    return add_contact([contact_name, number], args[1])
+                if first_char == 'N':
+                    return 'As you say'
+                        
+    return inner
+
 def parse_input(user_input: str) -> tuple:
     """
     Parse user input into command and arguments.
@@ -16,6 +92,7 @@ def parse_input(user_input: str) -> tuple:
     cmd = cmd.strip().lower()
     return cmd, *args
 
+@add_input_error
 def add_contact(args: tuple, path: str) -> str:
     """
     Add a new contact to the phone book file.
@@ -44,6 +121,7 @@ def add_contact(args: tuple, path: str) -> str:
 
     return "Contact added."
 
+@change_input_error
 def change_contact(args: tuple, path: str) -> str:
     """
     Update phone number for an existing contact.
@@ -82,6 +160,7 @@ def change_contact(args: tuple, path: str) -> str:
         
     return "contact changed"
 
+@phone_input_error
 def phone_username(args, path):
     """
     Retrieve phone number for a specific contact.
@@ -101,8 +180,6 @@ def phone_username(args, path):
             # Get phone for requested contact (args[0] is the name)
             return f'{args[0]} {contacts[args[0]]}'
         
-    except KeyError:
-        return f"The contact '{args[0]}' does not exist in your list"
     except FileNotFoundError:
         return "You haven't added any contacts yet!"
 
