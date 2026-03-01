@@ -26,21 +26,25 @@ def input_error(func):
         except KeyError:
             # Extract contact name from args (first element of first argument)
             contact_name = args[0][0]
-            print(f"The contact '{contact_name}' does not exist in your list")
+            
+            if not contact_name.isdigit():
+                print(f"The contact '{contact_name}' does not exist in your list")
 
-            # Interactive loop to offer adding the contact
-            while True:
-                user_input = input('Would you like to add a contact? Yes/No ')
-                # Get first character and normalize to uppercase
-                first_char = user_input[0].upper()
+                # Interactive loop to offer adding the contact
+                while True:
+                    user_input = input('Would you like to add a contact? Yes/No ')
+                    # Get first character and normalize to uppercase
+                    first_char = user_input[0].upper()
 
-                if first_char == 'Y':
-                    # User wants to add contact
-                    number = input(f'enter {contact_name} contact number ')
-                    return add_contact([contact_name, number], args[1])
-                if first_char == 'N':
-                    return 'As you say'
-
+                    if first_char == 'Y':
+                        # User wants to add contact
+                        number = input(f'enter {contact_name} contact number ')
+                        return add_contact([contact_name, number], args[1])
+                    if first_char == 'N':
+                        return 'As you say'
+            else:
+                return "You need to enter the contact's name, not the number!"
+            
     return inner
 
 def parse_input(user_input: str) -> tuple:
