@@ -1,7 +1,7 @@
 from collections import Counter
 from pathlib import Path
 
-def parse_log_file(line: str) -> dict:
+def parse_log_line(line: str) -> dict:
 
     """
     Parse a single log line into dictionary components.
@@ -39,7 +39,7 @@ def load_logs(file_path: str) -> list:
     else:
         # Read and parse log file
         with open(file_path, 'r', encoding='utf-8' ) as file:
-            logs = [parse_log_file(line.strip()) for line in file.readlines()]
+            logs = [parse_log_line(line.strip()) for line in file.readlines()]
         
         # Check if file is empty
         if not logs:

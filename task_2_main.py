@@ -8,7 +8,7 @@ def generator_numbers(text: str):
     """
 
     # Find all numbers as strings
-    numbers = re.findall(r'\d+\.?\d*', text)
+    numbers = re.findall(r'(?<= )\d+\.?\d*(?= )', text)
 
     # Yield each number as float (generator!)
     for num in numbers:

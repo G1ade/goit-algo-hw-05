@@ -1,59 +1,26 @@
-def add_input_error(func):
-    """
-    Decorator that catches ValueError for add_contact function.
-    
-    Returns user-friendly message when name and phone are not provided.
-    
-    Args:
-        func: Function to decorate (add_contact)
-        
-    Returns:
-        inner: Wrapped function with error handling
-    """
+def input_error(func):
     def inner(*args, **kwargs):
+        """
+        Decorator that handles input errors for contact management functions.
+        
+        Catches and handles:
+        - ValueError: when name and phone are not provided correctly
+        - IndexError: when contact name is missing
+        - KeyError: when contact does not exist in the list
+        
+        On KeyError, offers interactive option to add the missing contact.
+        
+        Args:
+            func: Function to decorate (add_contact, change_contact, etc.)
+            
+        Returns:
+            inner: Wrapped function with comprehensive error handling
+        """
+
         try:
             return func(*args, **kwargs)
         except ValueError:
             return "Give me name and phone please."
-
-    return inner
-
-def change_input_error(funk):
-    """
-    Decorator that catches ValueError for change_contact function.
-    
-    Returns user-friendly message when contact name and new number are not provided.
-    
-    Args:
-        func: Function to decorate (change_contact)
-        
-    Returns:
-        inner: Wrapped function with error handling
-    """
-    def inner(*args, **kwargs):
-        try:
-            return funk(*args, **kwargs)
-        except ValueError:
-            return "You need to enter the contact's name and new number"
-        
-    return inner
-
-def phone_input_error(funk):
-    """
-    Decorator that handles errors for phone lookup function.
-    
-    Catches IndexError (missing contact name) and KeyError (contact not found).
-    When contact is not found, offers to add the contact interactively.
-    
-    Args:
-        func: Function to decorate (phone_username)
-        
-    Returns:
-        inner: Wrapped function with error handling and interactive add feature
-    """
-    def inner(*args, **kwargs):
-        try:
-            return funk(*args, **kwargs)
         except IndexError:
             return "You need to enter the contact's name"
         except KeyError:
@@ -61,17 +28,19 @@ def phone_input_error(funk):
             contact_name = args[0][0]
             print(f"The contact '{contact_name}' does not exist in your list")
 
+            # Interactive loop to offer adding the contact
             while True:
-                user_input = input('Would you like to add a number? Yes/No ')
+                user_input = input('Would you like to add a contact? Yes/No ')
                 # Get first character and normalize to uppercase
                 first_char = user_input[0].upper()
 
                 if first_char == 'Y':
+                    # User wants to add contact
                     number = input(f'enter {contact_name} contact number ')
                     return add_contact([contact_name, number], args[1])
                 if first_char == 'N':
                     return 'As you say'
-                        
+
     return inner
 
 def parse_input(user_input: str) -> tuple:
@@ -92,7 +61,7 @@ def parse_input(user_input: str) -> tuple:
     cmd = cmd.strip().lower()
     return cmd, *args
 
-@add_input_error
+@input_error
 def add_contact(args: tuple, path: str) -> str:
     """
     Add a new contact to the phone book file.
@@ -121,7 +90,7 @@ def add_contact(args: tuple, path: str) -> str:
 
     return "Contact added."
 
-@change_input_error
+@input_error
 def change_contact(args: tuple, path: str) -> str:
     """
     Update phone number for an existing contact.
@@ -160,7 +129,7 @@ def change_contact(args: tuple, path: str) -> str:
         
     return "contact changed"
 
-@phone_input_error
+@input_error
 def phone_username(args, path):
     """
     Retrieve phone number for a specific contact.
